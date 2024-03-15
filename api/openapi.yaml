@@ -1,0 +1,4239 @@
+openapi: 3.0.2
+info:
+  description: Coinprofile business API
+  title: Coinprofile business API
+  version: 1.0.0
+servers:
+- description: Production
+  url: https://staging-biz.coinprofile.co/v2
+tags:
+- name: Voucher
+- name: Balance
+- name: Wallet
+- name: Payment
+- name: Transaction
+- name: Merchants
+- name: Rates
+- name: Webhook
+- name: Currency
+- name: Mock Payment
+- name: Transactions
+- name: Voucher fee
+- name: Voucher min-max amount
+- name: ApiKey
+- name: BankAccount
+- name: Bank
+paths:
+  /v1/balance:
+    get:
+      description: Retrieves account balance for the selected currency
+      operationId: Balance_getAccountBalance
+      parameters:
+      - description: One of supported currencies
+        explode: true
+        in: query
+        name: currency
+        required: true
+        schema:
+          enum:
+          - NGN
+          - USD
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceGetAccountBalanceResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Retrieve merchant account balance
+      tags:
+      - Balance
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v1-balance
+      x-accepts: application/json
+  /v1/merchants:
+    get:
+      description: "Retrieves merchant record - username, email, callback URL, merchant\
+        \ logo, creditCurrency, API key expiry date-time"
+      operationId: Merchants_getRecord
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantsGetRecordResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Retrieve merchant record
+      tags:
+      - Merchants
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v1-merchants
+      x-accepts: application/json
+    patch:
+      description: Updates merchant record
+      operationId: Merchants_updateRecord
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantsUpdateRecordRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantsUpdateRecordResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Update merchant record
+      tags:
+      - Merchants
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-patch--v1-merchants
+      x-content-type: application/json
+      x-accepts: application/json
+  /v1/mock/payment:
+    post:
+      description: Sends a mock payment request (only in staging environment)
+      operationId: MockPayment_requestSubmission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MockPaymentRequestSubmissionRequest'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MockPaymentRequestSubmissionResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MockPaymentRequestSubmission400Response'
+          description: Failed operation
+          x-do-not-generate: true
+      summary: Make a mock payment
+      tags:
+      - Mock Payment
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v1-mock-payment
+      x-content-type: application/json
+      x-accepts: application/json
+  /v1/currency/rates:
+    get:
+      description: Retrieves conversion rates for all supported currencies
+      operationId: Rates_getConversionRates
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatesGetConversionRatesResponse'
+          description: successful operation
+      summary: Retrieves conversion rates
+      tags:
+      - Rates
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v1-currency-rates
+      x-accepts: application/json
+  /v1/transactions/summary:
+    get:
+      description: Retrieves transaction summary for the selected currency for a merchant
+      operationId: Transactions_getMerchantTransactionSummary
+      parameters:
+      - description: One of supported currencies
+        explode: true
+        in: query
+        name: currency
+        required: true
+        schema:
+          enum:
+          - NGN
+          - USD
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsGetMerchantTransactionSummaryResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Retrieve merchant transaction summary
+      tags:
+      - Transactions
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v1-transactions-summary
+      x-accepts: application/json
+  /v1/vouchers:
+    get:
+      description: "Retrieves an existing voucher record(s). When no query param is\
+        \ provided, all the voucher record for the merchant will be returned. If accountNumber\
+        \ field is provided in the query, all the voucher records associated with\
+        \ the given accountNumber for the merchant will be returned."
+      operationId: Voucher_getRecord
+      parameters:
+      - description: Voucher id
+        explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Voucher memo or reference number
+        explode: true
+        in: query
+        name: memo
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: The account number used to pay for voucher
+        explode: true
+        in: query
+        name: accountNumber
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherGetRecordResponse'
+          description: successful operation
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherGetRecord404Response'
+          description: Failed operation
+          x-do-not-generate: true
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Retrieve voucher record
+      tags:
+      - Voucher
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v1-vouchers
+      x-accepts: application/json
+    patch:
+      description: Redeems an existing unused voucher
+      operationId: Voucher_redeemExistingUnused
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoucherRedeemExistingUnusedRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherRedeemExistingUnusedResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherRedeemExistingUnused400Response'
+          description: Failed operation
+          x-do-not-generate: true
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherRedeemExistingUnused404Response'
+          description: Failed operation
+          x-do-not-generate: true
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Redeem existing unused voucher
+      tags:
+      - Voucher
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-patch--v1-vouchers
+      x-content-type: application/json
+      x-accepts: application/json
+    post:
+      description: Creates a new voucher payment for a user
+      operationId: Voucher_createPayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoucherCreatePaymentRequest'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherCreatePaymentResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherCreatePayment400Response'
+          description: Failed operation
+          x-do-not-generate: true
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Create a new voucher payment
+      tags:
+      - Voucher
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v1-vouchers
+      x-content-type: application/json
+      x-accepts: application/json
+  /v1/voucher/get-many:
+    get:
+      description: "Retrieves a collection of voucher records, sorted in descending\
+        \ order by their creation date."
+      operationId: Voucher_getMultipleRecords
+      parameters:
+      - description: Defaults to 1. This is the current page being requested relative
+          to size of a page
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: number
+        style: form
+      - description: The number of items to be retured per page
+        explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          type: number
+        style: form
+      - description: Voucher payment status
+        explode: true
+        in: query
+        name: paymentStatus
+        required: false
+        schema:
+          enum:
+          - paid
+          - unpaid
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherGetMultipleRecordsResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherGetMultipleRecords400Response'
+          description: Failed operation
+          x-do-not-generate: true
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Get multiple records
+      tags:
+      - Voucher
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v1-voucher-get-many
+      x-accepts: application/json
+  /v1/voucher:
+    patch:
+      description: Redeems an existing unused voucher and transfers crypto to the
+        provided wallet address
+      operationId: Voucher_redeemAndWithdraw
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoucherRedeemAndWithdrawRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherRedeemAndWithdrawResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherRedeemAndWithdraw400Response'
+          description: Failed operation
+          x-do-not-generate: true
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherRedeemAndWithdraw404Response'
+          description: Failed operation
+          x-do-not-generate: true
+      security:
+      - ApiKey: []
+        ApiUser: []
+      summary: Redeem and withdraw
+      tags:
+      - Voucher
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-patch--v1-voucher
+      x-content-type: application/json
+      x-accepts: application/json
+  /v1/voucher-fee:
+    get:
+      description: Retrieves fee for a given voucher amount and currency.
+      operationId: VoucherFee_getFee
+      parameters:
+      - description: Voucher amount
+        explode: true
+        in: query
+        name: amount
+        required: true
+        schema:
+          type: integer
+        style: form
+      - description: Voucher currency
+        explode: true
+        in: query
+        name: currency
+        required: true
+        schema:
+          enum:
+          - NGN
+          - USD
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherFeeGetFeeResponse'
+          description: successful operation
+      summary: Retrieves conversion rates
+      tags:
+      - Voucher fee
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v1-voucher-fee
+      x-accepts: application/json
+  /v1/voucher-min-max:
+    get:
+      description: Retrieves minimum and maximum voucher amounts for each currency.
+      operationId: VoucherMinmaxAmount_getMinMaxAmount
+      parameters:
+      - description: Voucher currency
+        explode: true
+        in: query
+        name: currency
+        required: false
+        schema:
+          enum:
+          - NGN
+          - USD
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherMinmaxAmountGetMinMaxAmountResponse'
+          description: successful operation
+      summary: Retrieves minimum and maximum voucher amounts
+      tags:
+      - Voucher min-max amount
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v1-voucher-min-max
+      x-accepts: application/json
+  /auth/api-key:
+    post:
+      description: Create a new api key
+      operationId: ApiKey_generateNewApiKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyGenerateNewApiKeyRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyGenerateNewApiKeyResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Create api key
+      tags:
+      - ApiKey
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--auth-api-key
+      x-content-type: application/json
+      x-accepts: application/json
+  /payment:
+    post:
+      description: Create a new payment
+      operationId: Payment_createNewPayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateNewPaymentRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentCreateNewPaymentResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Create payment
+      tags:
+      - Payment
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--payment
+      x-content-type: application/json
+      x-accepts: application/json
+  /payment/{paymentId}:
+    get:
+      description: Get a single payment
+      operationId: Payment_getSingle
+      parameters:
+      - description: The ID of the created payment
+        explode: false
+        in: path
+        name: paymentId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentGetSingleResponse'
+          description: Success
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Get a single payment
+      tags:
+      - Payment
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--payment-paymentId
+      x-accepts: application/json
+  /transaction/{transactionId}:
+    get:
+      description: Get a transaction
+      operationId: Transaction_getDetails
+      parameters:
+      - explode: false
+        in: path
+        name: transactionId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionGetDetailsResponse'
+          description: Success
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Get a transaction
+      tags:
+      - Transaction
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--transaction-transactionId
+      x-accepts: application/json
+  /currency/rate:
+    get:
+      description: Get the current rates
+      operationId: Rates_getCurrentRates
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatesGetCurrentRatesResponse'
+          description: Success
+      summary: Get current rates
+      tags:
+      - Rates
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--currency-rate
+      x-accepts: application/json
+  /currency/minimum-allowed:
+    get:
+      description: Get minimum amount allowed
+      operationId: Currency_getMinimumAllowed
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyGetMinimumAllowedResponse'
+          description: Success
+      summary: Get minimum amount allowed
+      tags:
+      - Currency
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--currency-minimum-allowed
+      x-accepts: application/json
+  /currency/supported:
+    get:
+      description: Get supported currencies
+      operationId: Currency_listSupportedCurrencies
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyListSupportedCurrenciesResponse'
+          description: Success
+      summary: Get supported currencies
+      tags:
+      - Currency
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--currency-supported
+      x-accepts: application/json
+  /wallet/supported/config:
+    get:
+      description: Get supported cryptocurrencies and networks
+      operationId: Wallet_getSupportedConfig
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletGetSupportedConfigResponse'
+          description: Success
+      summary: Get supported cryptocurrencies and network
+      tags:
+      - Wallet
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--wallet-supported-config
+      x-accepts: application/json
+  /payment/resolve:
+    get:
+      description: Resolve overpaid Transaction
+      operationId: Payment_resolveOverpaidTransaction
+      parameters:
+      - description: The ID of the unresolved transaction
+        explode: true
+        in: query
+        name: id
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: This is the way you want the transaction to be completed. Either
+          refundExcess or PayAll option
+        explode: true
+        in: query
+        name: option
+        required: true
+        schema:
+          enum:
+          - refundexcess
+          - payall
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResolveOverpaidTransactionResponse'
+          description: Success
+      summary: Resolve overpaid Transaction
+      tags:
+      - Payment
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--payment-resolve
+      x-accepts: application/json
+  /callbackurl:
+    get:
+      description: Retrieve the callback url used as webhook
+      operationId: Webhook_getCallbackUrl
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookGetCallbackUrlResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Retrieve subscribed webhook url
+      tags:
+      - Webhook
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--callbackurl
+      x-accepts: application/json
+    put:
+      description: Set the callback url that will be used as webhook
+      operationId: Webhook_subscribeWebhookCallback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookSubscribeWebhookCallbackRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSubscribeWebhookCallbackResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Subscribe to webhook
+      tags:
+      - Webhook
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-put--callbackurl
+      x-content-type: application/json
+      x-accepts: application/json
+  /transaction:
+    get:
+      description: Retrieves all user transactions
+      operationId: Transaction_getUserTransactions
+      parameters:
+      - description: "Currency for which transactions are to be retrieved. When this\
+          \ is not supplied, transactions will be retrieved for all available currencies."
+        explode: true
+        in: query
+        name: currency
+        required: false
+        schema:
+          enum:
+          - NGN
+          - USD
+          type: string
+        style: form
+      - description: "Type of transactions to be retrieved. When this is not supplied,\
+          \ transactions will be retrieved for all available types."
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          enum:
+          - deposit
+          - withdrawal
+          - sent
+          - transfer
+          - internalTransfer
+          - conversion
+          type: string
+        style: form
+      - description: Number of pages to be retrieved.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: number
+        style: form
+      - description: Number of transaction records to be retrieved per page page.
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: number
+        style: form
+      - description: Duration of the transaction to be retrieved per page page.
+        explode: true
+        in: query
+        name: duration
+        required: false
+        schema:
+          enum:
+          - null
+          - null
+          - null
+          - null
+          type: number
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionGetUserTransactionsResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Retrieve user's transaction records
+      tags:
+      - Transaction
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--transaction
+      x-accepts: application/json
+  /transaction/summary:
+    get:
+      description: Retrieves all user transactions summary
+      operationId: Transaction_getUserTransactionSummary
+      parameters:
+      - description: "Currency for which transactions are to be retrieved. When this\
+          \ is not supplied, transactions will be retrieved for all available currencies."
+        explode: true
+        in: query
+        name: currency
+        required: false
+        schema:
+          enum:
+          - NGN
+          - USD
+          type: string
+        style: form
+      - description: "Type of transactions to be retrieved. When this is not supplied,\
+          \ transactions will be retrieved for all available types."
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          enum:
+          - deposit
+          - withdrawal
+          - sent
+          - transfer
+          - internalTransfer
+          - conversion
+          type: string
+        style: form
+      - description: Number of pages to be retrieved.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: number
+        style: form
+      - description: Number of transaction records to be retrieved per page page.
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: number
+        style: form
+      - description: Duration of the transaction to be retrieved per page page.
+        explode: true
+        in: query
+        name: duration
+        required: false
+        schema:
+          enum:
+          - null
+          - null
+          - null
+          - null
+          type: number
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionGetUserTransactionSummaryResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Retrieve user's transaction summary
+      tags:
+      - Transaction
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--transaction-summary
+      x-accepts: application/json
+  /wallet:
+    get:
+      description: get wallet
+      operationId: Wallet_getAddresses
+      parameters:
+      - description: The cryptocurrency for which address will be retrieved
+        explode: true
+        in: query
+        name: currency
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: The crypto network of the retrieved wallet address
+        explode: true
+        in: query
+        name: network
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletGetAddressesResponse'
+          description: successfully retrieved wallet
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Retrieves a user's crypto wallet addresses
+      tags:
+      - Wallet
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--wallet
+      x-accepts: application/json
+  /balance/withdraw:
+    post:
+      description: Withdraw funds from the user's balance
+      operationId: Balance_withdrawFunds
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceWithdrawFundsRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceWithdrawFundsResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Withdraw balance
+      tags:
+      - Balance
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--balance-withdraw
+      x-content-type: application/json
+      x-accepts: application/json
+  /bank/resolve:
+    post:
+      description: Verifies the bank account and returns the bank account details
+      operationId: BankAccount_verifyAndReturnDetails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankAccountVerifyAndReturnDetailsRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountVerifyAndReturnDetailsResponse'
+          description: successful operation
+      summary: Resolve bank account
+      tags:
+      - BankAccount
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--bank-resolve
+      x-content-type: application/json
+      x-accepts: application/json
+  /bank/supported:
+    get:
+      description: Retrieve a list of supported banks
+      operationId: Bank_getSupportedBanks
+      parameters:
+      - description: The country from which to retrieve supported banks
+        explode: true
+        in: query
+        name: country
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankGetSupportedBanksResponse'
+          description: successful operation
+      summary: Retrieve a list of supported banks
+      tags:
+      - Bank
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--bank-supported
+      x-accepts: application/json
+  /balance:
+    get:
+      description: Retrieves account balance for each currency
+      operationId: Balance_getAccountBalance
+      parameters:
+      - description: "Currency for which balance is to be retrieved. When this is\
+          \ not supplied, balance will be retrieved for all available currencies."
+        explode: true
+        in: query
+        name: currency
+        required: false
+        schema:
+          enum:
+          - NGN
+          - USD
+          - USDT
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceGetAccountBalance200Response'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Retrieve user's account balance
+      tags:
+      - Balance
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--balance
+      x-accepts: application/json
+  /balance/transfer:
+    post:
+      description: Transfer funds from user's balance to another user (fiat-to-fiat)
+      operationId: Balance_transferFunds
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceTransferFundsRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceTransferFundsResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Transfer funds
+      tags:
+      - Balance
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--balance-transfer
+      x-content-type: application/json
+      x-accepts: application/json
+  /wallet/transfer:
+    post:
+      description: Transfer crypto from one wallet address to another
+      operationId: Wallet_executeTransfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletExecuteTransferRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletExecuteTransferResponse'
+          description: successful operation
+      security:
+      - ApiKey: []
+        ApiUser: []
+        UserVersion: []
+      summary: Wallet transfer
+      tags:
+      - Wallet
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--wallet-transfer
+      x-content-type: application/json
+      x-accepts: application/json
+components:
+  schemas:
+    MerchantsUpdateRecordRequest:
+      example:
+        logo: https://www.example.com/favicon
+        callbackUrl: https://www.example.com/webhook/ventogram
+        feeBearer: client
+        creditCurrency: NGN
+      properties:
+        callbackUrl:
+          description: Merchant callback URL. Webhook will be sent to this URL.
+          example: https://www.example.com/webhook/ventogram
+          type: string
+          x-konfig-original-example: https://www.example.com/webhook/ventogram
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-callbackUrl
+        creditCurrency:
+          description: "Merchants can set this property to their desired currency.\
+            \ Their balance on Ventogram will be credited with this currency when\
+            \ their users redeem voucher created on Ventogram. Conversion between\
+            \ different currencies will be performed at the rate which is obtainable\
+            \ at the time of redeeming the voucher. If this is not set by the merchant,\
+            \  their balance will be credited with the currency used in creating the\
+            \ voucher."
+          enum:
+          - NGN
+          - USD
+          - ""
+          type: string
+        feeBearer:
+          description: Bearer of the voucher fee
+          enum:
+          - client
+          - merchant
+          example: client
+          type: string
+          x-konfig-original-example: client
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-feeBearer
+        logo:
+          description: Merchant logo URL
+          example: https://www.example.com/favicon
+          type: string
+          x-konfig-original-example: https://www.example.com/favicon
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-logo
+      type: object
+    MockPaymentRequestSubmissionRequest:
+      example:
+        amount: 0
+        voucherId: voucherId
+      properties:
+        amount:
+          description: "Amount to pay. This can be used to simulate overpayment and\
+            \ underpayment in staging environment. If this field is not provided,\
+            \ the expected amount will be paid."
+          format: int32
+          type: integer
+        voucherId:
+          description: ID of the voucher to be paid
+          type: string
+      required:
+      - voucherId
+      type: object
+    VoucherRedeemExistingUnusedRequest:
+      example:
+        email: email
+        voucherCode: voucherCode
+      properties:
+        email:
+          description: Email that was used to create the voucher
+          type: string
+        voucherCode:
+          description: Voucher code to be redeemed
+          type: string
+      required:
+      - email
+      - voucherCode
+      type: object
+    VoucherCreatePaymentRequest:
+      example:
+        rateKey: rateKey
+        amount: 0
+        currency: NGN
+        fullname: fullname
+        email: email
+      properties:
+        amount:
+          description: Required voucher amount
+          format: int32
+          type: integer
+        currency:
+          description: Required voucher currency
+          enum:
+          - NGN
+          - USD
+          type: string
+        email:
+          description: User email
+          type: string
+        fullname:
+          description: Fullname of the user creating voucher
+          type: string
+        rateKey:
+          description: "This is a Ventogram-signed rate key. If provided when a voucher\
+            \ is created, the conversion will use the rate signed with this key if\
+            \ it is valid at the time of redeeming a voucher. Conversion will use\
+            \ the current rate if key has expired."
+          type: string
+      required:
+      - amount
+      - currency
+      - email
+      - fullname
+      type: object
+    VoucherRedeemAndWithdrawRequest:
+      example:
+        rateKey: rateKey
+        cryptoAddress: cryptoAddress
+        merchantFee: USD
+        currency: USDC
+        email: email
+        voucherCode: voucherCode
+        network: network
+      properties:
+        cryptoAddress:
+          description: "Must be provided along with newtwork. The crypto wallet address\
+            \ on the provided network, to which crypto equivalent will be sent"
+          type: string
+        currency:
+          description: Cryptocurrency to send to the provided wallet details
+          enum:
+          - USDC
+          - USDT
+          type: string
+        email:
+          description: Email that was used to create the voucher
+          type: string
+        merchantFee:
+          description: In USD (optional). Can be supplied if the merchant want to
+            withdraw a portion of the voucher amount into their Ventogram balance.
+            This must be a fraction or all of voucher value (ie received amount -
+            voucher fee)
+          enum:
+          - USD
+          type: string
+        network:
+          description: Supported crypto network
+          type: string
+        rateKey:
+          description: This is a Ventogram-signed rate key. This will be returned
+            in response if the signed rate was used for conversion.
+          type: string
+        voucherCode:
+          description: Voucher code to be redeemed
+          type: string
+      required:
+      - cryptoAddress
+      - currency
+      - email
+      - network
+      - voucherCode
+      type: object
+    ApiKeyGenerateNewApiKeyRequest:
+      example:
+        otpType: otpType
+        token: token
+      properties:
+        otpType:
+          type: string
+        token:
+          type: string
+      type: object
+    PaymentCreateNewPaymentRequest:
+      example:
+        bankCode: bankCode
+        country: country
+        rateKey: rateKey
+        incomingAmount: 0.8008281904610115
+        accountName: accountName
+        businessId: businessId
+        incomingCurrency: incomingCurrency
+        coinprofileUsername: coinprofileUsername
+        accountNumber: accountNumber
+        paymentType: paymentType
+        reference: reference
+        bank: bank
+        outgoingCurrency: outgoingCurrency
+        customerEmail: customerEmail
+        outgoingAmount: 6.027456183070403
+      properties:
+        accountName:
+          description: The account name. Required when paymentType is bank
+          type: string
+        accountNumber:
+          description: The account number. Required when paymentType is bank
+          type: string
+        bank:
+          description: The bank name. Required when paymentType is bank
+          type: string
+        bankCode:
+          description: The bank code. Required when paymentType is bank
+          type: string
+        businessId:
+          description: The business id
+          type: string
+        coinprofileUsername:
+          description: The coinprofile username. Required when paymentType is profile
+          type: string
+        country:
+          description: The country. Required when paymentType is bank
+          type: string
+        customerEmail:
+          description: The rate key
+          type: string
+        incomingAmount:
+          description: The incoming amount
+          type: number
+        incomingCurrency:
+          description: The incoming currency
+          type: string
+        outgoingAmount:
+          description: The outgoing amount
+          type: number
+        outgoingCurrency:
+          description: The outgoing currency
+          type: string
+        paymentType:
+          description: The payment type
+          type: string
+        rateKey:
+          description: The rate key
+          type: string
+        reference:
+          description: The reference
+          type: string
+      required:
+      - businessId
+      - customerEmail
+      - incomingCurrency
+      - outgoingCurrency
+      - paymentType
+      type: object
+    WebhookSubscribeWebhookCallbackRequest:
+      example:
+        callbackUrl: callbackUrl
+      properties:
+        callbackUrl:
+          description: The callback url. e.g. https://www.example.com/callback
+          type: string
+      required:
+      - callbackUrl
+      type: object
+    BalanceWithdrawFundsRequest:
+      example:
+        bankCode: bankCode
+        amount: amount
+        bank: bank
+        accountName: accountName
+        currency: currency
+        accountNumber: accountNumber
+        otpType: otp
+        token: token
+      properties:
+        accountName:
+          description: The account name. This is the name of the account holder.
+          type: string
+        accountNumber:
+          description: The account number of the user's bank account.
+          type: string
+        amount:
+          description: The amount to be withdrawn.
+          type: string
+        bank:
+          description: The bank name. e.g. "Access Bank".
+          type: string
+        bankCode:
+          description: The bank code. e.g. "044".
+          type: string
+        currency:
+          description: The currency of the withdrawal.
+          type: string
+        otpType:
+          description: The type of OTP to be used.
+          enum:
+          - otp
+          - totp
+          type: string
+        token:
+          description: The token to be used for OTP.
+          type: string
+      required:
+      - accountName
+      - accountNumber
+      - amount
+      - bank
+      - bankCode
+      - currency
+      - otpType
+      type: object
+    BankAccountVerifyAndReturnDetailsRequest:
+      example:
+        bankCode: bankCode
+        accountNumber: accountNumber
+      properties:
+        accountNumber:
+          description: The account number.
+          type: string
+        bankCode:
+          description: The bank code.
+          type: string
+      required:
+      - accountNumber
+      - bankCode
+      type: object
+    BalanceTransferFundsRequest:
+      example:
+        amount: amount
+        memo: memo
+        currency: NGN
+        otpType: otp
+        receiverUsername: receiverUsername
+        token: token
+      properties:
+        amount:
+          description: Amount to transfer.
+          type: string
+        currency:
+          description: Currency being sent.
+          enum:
+          - NGN
+          - USD
+          type: string
+        memo:
+          description: Transaction memo.
+          maxLength: 28
+          type: string
+        otpType:
+          description: The type of OTP to be used.
+          enum:
+          - otp
+          - totp
+          type: string
+        receiverUsername:
+          description: Receiver's coinprofile username.
+          type: string
+        token:
+          description: The token to be used for OTP.
+          type: string
+      required:
+      - currency
+      - receiverUsername
+      type: object
+    WalletExecuteTransferRequest:
+      example:
+        amount: 0.8008281904610115
+        address: address
+        walletType: walletType
+        memo: memo
+        currency: currency
+        network: network
+      properties:
+        address:
+          description: Wallet address to transfer crypto
+          type: string
+        amount:
+          description: Amount of crypto to be transferred
+          type: number
+        currency:
+          description: Currency of the crypto to be transferred
+          type: string
+        memo:
+          description: Optional transaction memo
+          type: string
+        network:
+          description: Network on which crypto is to be transferred
+          type: string
+        walletType:
+          description: Wallet type
+          type: string
+      required:
+      - address
+      - amount
+      - currency
+      - network
+      type: object
+    BalanceGetAccountBalanceResponse:
+      example:
+        data:
+          amount: 0
+          txnCount: 6
+          merchant: merchant
+          currency: currency
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/BalanceGetAccountBalanceResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    MerchantsGetRecordResponse:
+      example:
+        data:
+          expires: 2023-10-03T09:21:05.197Z
+          logo: https://www.example.com/favicon
+          creditCurrency: NGN
+          email: email
+          username: username
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/MerchantsGetRecordResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    MerchantsUpdateRecordResponse:
+      example:
+        data:
+          logo: logo
+          callbackUrl: callbackUrl
+          feeBearer: feeBearer
+          creditCurrency: NGN
+          username: username
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/MerchantsUpdateRecordResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    MockPaymentRequestSubmissionResponse:
+      example:
+        success: true
+        message: message
+      properties:
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    MockPaymentRequestSubmission400Response:
+      properties:
+        message:
+          type: string
+        success:
+          enum:
+          - false
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    RatesGetConversionRatesResponse:
+      example:
+        data:
+          USDNGN:
+            rateKey: rateKey
+            description: description
+            value: 490
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/RatesGetConversionRatesResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    TransactionsGetMerchantTransactionSummaryResponse:
+      example:
+        data:
+          totalUnredeemed: 5
+          totalPaid: 0
+          totalUnpaid: 1
+          totalRedeemed: 6
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/TransactionsGetMerchantTransactionSummaryResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    VoucherGetRecordResponse:
+      example:
+        data:
+        - amount: 0.8008281904610115
+          dateRedeemed: 2000-01-23T04:56:07.000+00:00
+          accountType: dynamic
+          cancelledAt: 2000-01-23T04:56:07.000+00:00
+          fee: 6.027456183070403
+          memo: memo
+          merchant: merchant
+          feeBearer: feeBearer
+          createdAt: createdAt
+          paymentExpiresAt: 2000-01-23T04:56:07.000+00:00
+          currency: currency
+          fullname: fullname
+          id: id
+          email: email
+          paymentStatus: paid
+          voucherCode: voucherCode
+        - amount: 0.8008281904610115
+          dateRedeemed: 2000-01-23T04:56:07.000+00:00
+          accountType: dynamic
+          cancelledAt: 2000-01-23T04:56:07.000+00:00
+          fee: 6.027456183070403
+          memo: memo
+          merchant: merchant
+          feeBearer: feeBearer
+          createdAt: createdAt
+          paymentExpiresAt: 2000-01-23T04:56:07.000+00:00
+          currency: currency
+          fullname: fullname
+          id: id
+          email: email
+          paymentStatus: paid
+          voucherCode: voucherCode
+        success: true
+        message: message
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/VoucherGetRecordResponse_data_inner'
+          type: array
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    VoucherGetRecord404Response:
+      properties:
+        errors:
+          example: []
+          type: array
+          x-konfig-original-example: []
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherGetRecord404Response-properties-errors
+        message:
+          type: string
+        success:
+          enum:
+          - false
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    VoucherRedeemExistingUnusedResponse:
+      example:
+        data:
+          amount: 0.8008281904610115
+          currentBalance: 6.027456183070403
+          fee: 1.4658129805029452
+          fromAmount: 5.962133916683182
+          toAmount: 7.061401241503109
+          merchant: merchant
+          feeBearer: client
+          previousBalance: 5.637376656633329
+          rate: 2.3021358869347655
+          toCurrency: toCurrency
+          currency: NGN
+          fromCurrency: fromCurrency
+          wavedFee: 9.301444243932576
+          id: id
+          email: email
+          voucherCode: voucherCode
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/VoucherRedeemExistingUnusedResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    VoucherRedeemExistingUnused400Response:
+      properties:
+        errors:
+          example:
+          - voucherCode is required
+          items:
+            type: string
+          type: array
+          x-konfig-original-example:
+          - voucherCode is required
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherRedeemExistingUnused400Response-properties-errors
+        message:
+          type: string
+        success:
+          enum:
+          - false
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    VoucherRedeemExistingUnused404Response:
+      properties:
+        errors:
+          example: []
+          type: array
+          x-konfig-original-example: []
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherRedeemExistingUnused404Response-properties-errors
+        message:
+          type: string
+        success:
+          enum:
+          - false
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    VoucherCreatePaymentResponse:
+      example:
+        data:
+          id: id
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/VoucherCreatePaymentResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    VoucherCreatePayment400Response:
+      properties:
+        errors:
+          example:
+          - email is required
+          - Invalid or expired rateKey
+          items:
+            type: string
+          type: array
+          x-konfig-original-example:
+          - email is required
+          - Invalid or expired rateKey
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherCreatePayment400Response-properties-errors
+        message:
+          type: string
+        success:
+          enum:
+          - false
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    VoucherGetMultipleRecordsResponse:
+      example:
+        data:
+        - rateKey: rateKey
+          amount: 0.8008281904610115
+          dateRedeemed: 2000-01-23T04:56:07.000+00:00
+          fee: 1.4658129805029452
+          memo: memo
+          merchant: merchant
+          feeBearer: client
+          receivedAmount: 5.637376656633329
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          rate: 5.962133916683182
+          paidAt: 2000-01-23T04:56:07.000+00:00
+          currency: currency
+          fullname: fullname
+          id: id
+          expectedAmount: 6.027456183070403
+          email: email
+          paymentStatus: paid
+          voucherCode: voucherCode
+        - rateKey: rateKey
+          amount: 0.8008281904610115
+          dateRedeemed: 2000-01-23T04:56:07.000+00:00
+          fee: 1.4658129805029452
+          memo: memo
+          merchant: merchant
+          feeBearer: client
+          receivedAmount: 5.637376656633329
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          rate: 5.962133916683182
+          paidAt: 2000-01-23T04:56:07.000+00:00
+          currency: currency
+          fullname: fullname
+          id: id
+          expectedAmount: 6.027456183070403
+          email: email
+          paymentStatus: paid
+          voucherCode: voucherCode
+        meta:
+          nextPage: nextPage
+          prevPage: prevPage
+        success: true
+        message: message
+      properties:
+        data:
+          description: "An array containing the retrieved voucher records, sorted\
+            \ in descending order by their creation date."
+          items:
+            $ref: '#/components/schemas/VoucherGetMultipleRecordsResponse_data_inner'
+          type: array
+        message:
+          type: string
+        meta:
+          $ref: '#/components/schemas/VoucherGetMultipleRecordsResponse_meta'
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    VoucherGetMultipleRecords400Response:
+      properties:
+        errors:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+        success:
+          enum:
+          - false
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    VoucherRedeemAndWithdrawResponse:
+      example:
+        data:
+          toAccount: toAccount
+          withdrawalFee: 3.616076749251911
+          currentBalance: 6.027456183070403
+          fromAmount: 1.4658129805029452
+          merchantFee: 5.962133916683182
+          toAmount: 7.061401241503109
+          merchant: merchant
+          feeBearer: merchant
+          voucherFee: 9.301444243932576
+          convertedVoucherFee: 0.8008281904610115
+          previousBalance: 5.637376656633329
+          reference: reference
+          rate: 2.3021358869347655
+          toCurrency: toCurrency
+          fromCurrency: fromCurrency
+          convertedVoucherFeeCurrency: convertedVoucherFeeCurrency
+          creditCurrency: creditCurrency
+          id: id
+          email: email
+          voucherCode: voucherCode
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/VoucherRedeemAndWithdrawResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    VoucherRedeemAndWithdraw400Response:
+      properties:
+        errors:
+          example:
+          - voucherCode is required
+          items:
+            type: string
+          type: array
+          x-konfig-original-example:
+          - voucherCode is required
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherRedeemAndWithdraw400Response-properties-errors
+        message:
+          type: string
+        success:
+          enum:
+          - false
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    VoucherRedeemAndWithdraw404Response:
+      properties:
+        errors:
+          example: []
+          type: array
+          x-konfig-original-example: []
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherRedeemAndWithdraw404Response-properties-errors
+        message:
+          type: string
+        success:
+          enum:
+          - false
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    VoucherFeeGetFeeResponse:
+      example:
+        data:
+          voucherFee: 0
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/VoucherFeeGetFeeResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    VoucherMinmaxAmountGetMinMaxAmountResponse:
+      example:
+        data:
+          NGN:
+            min: 500
+            max: 2000000
+          USD:
+            min: 100
+            max: 2000
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/VoucherMinmaxAmountGetMinMaxAmountResponse_data'
+        message:
+          type: string
+        success:
+          enum:
+          - true
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    ApiKeyGenerateNewApiKeyResponse:
+      example:
+        data:
+          expires: 2000-01-23
+          key: key
+      properties:
+        data:
+          $ref: '#/components/schemas/ApiKeyGenerateNewApiKeyResponse_data'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    PaymentCreateNewPaymentResponse:
+      example:
+        data:
+          address: address
+          incomingAmount: 6
+          expTime: expTime
+          businessId: businessId
+          incomingCurrency: incomingCurrency
+          unconfirmedAmount: 5
+          paymentType: paymentType
+          reference: reference
+          createdAt: createdAt
+          outgoingCurrency: outgoingCurrency
+          confirmedAmount: 0
+          rate: 5
+          customerEmail: customerEmail
+          _id: _id
+          state: state
+          threadTS: threadTS
+          account: account
+          senderUsername: senderUsername
+          outgoingAmount: 1
+          updatedAt: updatedAt
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/PaymentCreateNewPaymentResponse_data'
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    PaymentGetSingleResponse:
+      example:
+        success: true
+        message: message
+      properties:
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    TransactionGetDetailsResponse:
+      example:
+        amount: 0.8008281904610115
+        fromAmount: 6.027456183070403
+        prevBalance: 1.4658129805029452
+        businessId: businessId
+        memo: memo
+        isFromRegUser: true
+        message: message
+        type: type
+        transactionId: transactionId
+        sender: sender
+        success: true
+        currency: currency
+        fromCurrency: fromCurrency
+        status: status
+        username: username
+      properties:
+        amount:
+          type: number
+        businessId:
+          type: string
+        currency:
+          type: string
+        fromAmount:
+          type: number
+        fromCurrency:
+          type: string
+        isFromRegUser:
+          type: boolean
+        memo:
+          type: string
+        message:
+          type: string
+        prevBalance:
+          type: number
+        sender:
+          type: string
+        status:
+          type: string
+        success:
+          type: boolean
+        transactionId:
+          type: string
+        type:
+          type: string
+        username:
+          type: string
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    RatesGetCurrentRatesResponse:
+      example:
+        data:
+          signature: signature
+          YOUR_CURRENCY:
+            rate: 0.8008282
+            key: key
+          publicKey: publicKey
+      properties:
+        data:
+          $ref: '#/components/schemas/RatesGetCurrentRatesResponse_data'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    CurrencyGetMinimumAllowedResponse:
+      example:
+        data:
+        - "{}"
+        - "{}"
+      properties:
+        data:
+          items:
+            type: object
+          type: array
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    CurrencyListSupportedCurrenciesResponse:
+      example:
+        data:
+          incomingCurrencies:
+          - incomingCurrencies
+          - incomingCurrencies
+          outgoingCurrencies:
+          - outgoingCurrencies
+          - outgoingCurrencies
+      properties:
+        data:
+          $ref: '#/components/schemas/CurrencyListSupportedCurrenciesResponse_data'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    WalletGetSupportedConfigResponse:
+      example:
+        data:
+          byCurrency: "{}"
+          byNetwork: "{}"
+        state: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/WalletGetSupportedConfigResponse_data'
+        message:
+          type: string
+        state:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    PaymentResolveOverpaidTransactionResponse:
+      example:
+        success: true
+        message: message
+      properties:
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    WebhookGetCallbackUrlResponse:
+      example:
+        data:
+          callbackUrl: callbackUrl
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/WebhookGetCallbackUrlResponse_data'
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    WebhookSubscribeWebhookCallbackResponse:
+      example:
+        success: true
+        message: message
+      properties:
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    TransactionGetUserTransactionsResponse:
+      example:
+        data:
+          total: 3.616076749251911
+          pages: 7.061401241503109
+          perPage: 9.301444243932576
+          data:
+          - date: date
+            amount: 0.8008281904610115
+            senderPrevbalance: 5.637376656633329
+            fee: 6.027456183070403
+            fromAmount: 1.4658129805029452
+            prevBalance: 5.962133916683182
+            businessId: businessId
+            isFromRegUser: true
+            type: type
+            version: version
+            transactionId: transactionId
+            createdAt: 2000-01-23T04:56:07.000+00:00
+            sender: sender
+            currency: currency
+            fromCurrency: fromCurrency
+            status: status
+            updatedAt: 2000-01-23T04:56:07.000+00:00
+            username: username
+          - date: date
+            amount: 0.8008281904610115
+            senderPrevbalance: 5.637376656633329
+            fee: 6.027456183070403
+            fromAmount: 1.4658129805029452
+            prevBalance: 5.962133916683182
+            businessId: businessId
+            isFromRegUser: true
+            type: type
+            version: version
+            transactionId: transactionId
+            createdAt: 2000-01-23T04:56:07.000+00:00
+            sender: sender
+            currency: currency
+            fromCurrency: fromCurrency
+            status: status
+            updatedAt: 2000-01-23T04:56:07.000+00:00
+            username: username
+          page: 2.3021358869347655
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/TransactionGetUserTransactionsResponse_data'
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    TransactionGetUserTransactionSummaryResponse:
+      example:
+        data:
+          summary:
+            duration: 0.8008281904610115
+            volume: 1.4658129805029452
+            txnCount: 6.027456183070403
+          txn:
+            total: 3.616076749251911
+            pages: 7.061401241503109
+            perPage: 9.301444243932576
+            data:
+            - date: date
+              amount: 0.8008281904610115
+              senderPrevbalance: 5.637376656633329
+              fee: 6.027456183070403
+              fromAmount: 1.4658129805029452
+              prevBalance: 5.962133916683182
+              businessId: businessId
+              isFromRegUser: true
+              type: type
+              version: version
+              transactionId: transactionId
+              createdAt: 2000-01-23T04:56:07.000+00:00
+              sender: sender
+              currency: currency
+              fromCurrency: fromCurrency
+              status: status
+              updatedAt: 2000-01-23T04:56:07.000+00:00
+              username: username
+            - date: date
+              amount: 0.8008281904610115
+              senderPrevbalance: 5.637376656633329
+              fee: 6.027456183070403
+              fromAmount: 1.4658129805029452
+              prevBalance: 5.962133916683182
+              businessId: businessId
+              isFromRegUser: true
+              type: type
+              version: version
+              transactionId: transactionId
+              createdAt: 2000-01-23T04:56:07.000+00:00
+              sender: sender
+              currency: currency
+              fromCurrency: fromCurrency
+              status: status
+              updatedAt: 2000-01-23T04:56:07.000+00:00
+              username: username
+            page: 2.3021358869347655
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/TransactionGetUserTransactionSummaryResponse_data'
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    WalletGetAddressesResponse:
+      example:
+        wallet:
+          reference: reference
+          createdAt: 0.8008281904610115
+          uid: uid
+          addresses: ""
+          appName: appName
+          version: version
+          status: status
+          updatedAt: 6.027456183070403
+        success: true
+        message: message
+      properties:
+        message:
+          type: string
+        success:
+          type: boolean
+        wallet:
+          $ref: '#/components/schemas/WalletGetAddressesResponse_wallet'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    BalanceWithdrawFundsResponse:
+      example:
+        data: "{}"
+      properties:
+        data:
+          type: object
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    BankAccountVerifyAndReturnDetailsResponse:
+      example:
+        data:
+          country: country
+          responsecode: responsecode
+          accountnumber: accountnumber
+          code: code
+          is_visible: is_visible
+          responsemessage: responsemessage
+          phonenumber: phonenumber
+          created_at: created_at
+          uniquereference: uniquereference
+          deleted_at: deleted_at
+          accountname: accountname
+          updated_at: updated_at
+          is_trashed: is_trashed
+          name: name
+          currency: currency
+          internalreference: internalreference
+      properties:
+        data:
+          $ref: '#/components/schemas/BankAccountVerifyAndReturnDetailsResponse_data'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    BankGetSupportedBanksResponse:
+      example:
+        data:
+        - Code: Code
+          Name: Name
+        - Code: Code
+          Name: Name
+        success: true
+        message: message
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/BankGetSupportedBanksResponse_data_inner'
+          type: array
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    BalanceGetAccountBalance200Response:
+      example:
+        data:
+          balances:
+            amount: 0
+            toCurrency: toCurrency
+            txnCount: 5.637376656633329
+            totalSent: 5
+            totalRecieved: 1
+            formattedAmount: 6
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/BalanceGetAccountBalance200Response_data'
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    BalanceTransferFundsResponse:
+      example:
+        data:
+          date: 2000-01-23
+          receiveAmount: receiveAmount
+          amount: amount
+          sender: sender
+          toCurrency: NGN
+          senderPrevbalance: senderPrevbalance
+          fromCurrency: NGN
+          transactionId: transactionId
+          status: fullfiled
+          username: username
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/BalanceTransferFundsResponse_data'
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    WalletExecuteTransferResponse:
+      example:
+        data:
+          transferDetail:
+            date: date
+            receiveAmount: 6.027456183070403
+            amount: 0.8008281904610115
+            address: address
+            sender: sender
+            toCurrency: toCurrency
+            memo: memo
+            fromCurrency: fromCurrency
+            type: type
+            transactionId: transactionId
+            status: status
+            username: username
+        success: true
+        message: message
+      properties:
+        data:
+          $ref: '#/components/schemas/WalletExecuteTransferResponse_data'
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-callbackUrl:
+      example: https://www.example.com/webhook/ventogram
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-feeBearer:
+      example: client
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-logo:
+      example: https://www.example.com/favicon
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MerchantsGetRecordResponse-properties-data-properties-expires:
+      example: 2023-10-03T09:21:05.197Z
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-MerchantsGetRecordResponse-properties-data-properties-logo:
+      example: https://www.example.com/favicon
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-RatesGetConversionRatesResponse-properties-data-properties-USDNGN-properties-value:
+      example: 490
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-VoucherGetRecord404Response-properties-errors:
+      items:
+        type: string
+      type: array
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-VoucherRedeemExistingUnusedResponse-properties-data-properties-feeBearer:
+      example: client
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-VoucherRedeemExistingUnused400Response-properties-errors:
+      example:
+      - voucherCode is required
+      items:
+        example: voucherCode is required
+        type: string
+      type: array
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-VoucherRedeemExistingUnused404Response-properties-errors:
+      items:
+        type: string
+      type: array
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-VoucherCreatePayment400Response-properties-errors:
+      example:
+      - email is required
+      - Invalid or expired rateKey
+      items:
+        example: email is required
+        type: string
+      type: array
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-VoucherRedeemAndWithdraw400Response-properties-errors:
+      example:
+      - voucherCode is required
+      items:
+        example: voucherCode is required
+        type: string
+      type: array
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-VoucherRedeemAndWithdraw404Response-properties-errors:
+      items:
+        type: string
+      type: array
+      x-do-not-generate: true
+    ? konfig-generated-schema-components-schemas-VoucherMinmaxAmountGetMinMaxAmountResponse-properties-data-properties-NGN-properties-max
+    : example: 2000000
+      type: number
+      x-do-not-generate: true
+    ? konfig-generated-schema-components-schemas-VoucherMinmaxAmountGetMinMaxAmountResponse-properties-data-properties-NGN-properties-min
+    : example: 500
+      type: number
+      x-do-not-generate: true
+    ? konfig-generated-schema-components-schemas-VoucherMinmaxAmountGetMinMaxAmountResponse-properties-data-properties-USD-properties-max
+    : example: 2000
+      type: number
+      x-do-not-generate: true
+    ? konfig-generated-schema-components-schemas-VoucherMinmaxAmountGetMinMaxAmountResponse-properties-data-properties-USD-properties-min
+    : example: 100
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-single-parameter-schema-get--v1-balance:
+      properties:
+        currency:
+          enum:
+          - NGN
+          - USD
+          type: string
+      required:
+      - currency
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - currency
+    konfig-generated-schema-single-parameter-schema-get--v1-merchants:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-patch--v1-merchants:
+      properties:
+        callbackUrl:
+          description: Merchant callback URL. Webhook will be sent to this URL.
+          example: https://www.example.com/webhook/ventogram
+          type: string
+          x-konfig-original-example: https://www.example.com/webhook/ventogram
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-callbackUrl
+        creditCurrency:
+          description: "Merchants can set this property to their desired currency.\
+            \ Their balance on Ventogram will be credited with this currency when\
+            \ their users redeem voucher created on Ventogram. Conversion between\
+            \ different currencies will be performed at the rate which is obtainable\
+            \ at the time of redeeming the voucher. If this is not set by the merchant,\
+            \  their balance will be credited with the currency used in creating the\
+            \ voucher."
+          enum:
+          - NGN
+          - USD
+          - ""
+          type: string
+        feeBearer:
+          description: Bearer of the voucher fee
+          enum:
+          - client
+          - merchant
+          example: client
+          type: string
+          x-konfig-original-example: client
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-feeBearer
+        logo:
+          description: Merchant logo URL
+          example: https://www.example.com/favicon
+          type: string
+          x-konfig-original-example: https://www.example.com/favicon
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-MerchantsUpdateRecordRequest-properties-logo
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--v1-mock-payment:
+      properties:
+        amount:
+          description: "Amount to pay. This can be used to simulate overpayment and\
+            \ underpayment in staging environment. If this field is not provided,\
+            \ the expected amount will be paid."
+          format: int32
+          type: integer
+        voucherId:
+          description: ID of the voucher to be paid
+          type: string
+      required:
+      - voucherId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--v1-currency-rates:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--v1-transactions-summary:
+      properties:
+        currency:
+          enum:
+          - NGN
+          - USD
+          type: string
+      required:
+      - currency
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - currency
+    konfig-generated-schema-single-parameter-schema-get--v1-vouchers:
+      properties:
+        id:
+          type: string
+        memo:
+          type: string
+        accountNumber:
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - id
+      - memo
+      - accountNumber
+    konfig-generated-schema-single-parameter-schema-patch--v1-vouchers:
+      properties:
+        email:
+          description: Email that was used to create the voucher
+          type: string
+        voucherCode:
+          description: Voucher code to be redeemed
+          type: string
+      required:
+      - email
+      - voucherCode
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--v1-vouchers:
+      properties:
+        amount:
+          description: Required voucher amount
+          format: int32
+          type: integer
+        currency:
+          description: Required voucher currency
+          enum:
+          - NGN
+          - USD
+          type: string
+        email:
+          description: User email
+          type: string
+        fullname:
+          description: Fullname of the user creating voucher
+          type: string
+        rateKey:
+          description: "This is a Ventogram-signed rate key. If provided when a voucher\
+            \ is created, the conversion will use the rate signed with this key if\
+            \ it is valid at the time of redeeming a voucher. Conversion will use\
+            \ the current rate if key has expired."
+          type: string
+      required:
+      - amount
+      - currency
+      - email
+      - fullname
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--v1-voucher-get-many:
+      properties:
+        page:
+          type: number
+        pageSize:
+          type: number
+        paymentStatus:
+          enum:
+          - paid
+          - unpaid
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - page
+      - pageSize
+      - paymentStatus
+    konfig-generated-schema-single-parameter-schema-patch--v1-voucher:
+      properties:
+        cryptoAddress:
+          description: "Must be provided along with newtwork. The crypto wallet address\
+            \ on the provided network, to which crypto equivalent will be sent"
+          type: string
+        currency:
+          description: Cryptocurrency to send to the provided wallet details
+          enum:
+          - USDC
+          - USDT
+          type: string
+        email:
+          description: Email that was used to create the voucher
+          type: string
+        merchantFee:
+          description: In USD (optional). Can be supplied if the merchant want to
+            withdraw a portion of the voucher amount into their Ventogram balance.
+            This must be a fraction or all of voucher value (ie received amount -
+            voucher fee)
+          enum:
+          - USD
+          type: string
+        network:
+          description: Supported crypto network
+          type: string
+        rateKey:
+          description: This is a Ventogram-signed rate key. This will be returned
+            in response if the signed rate was used for conversion.
+          type: string
+        voucherCode:
+          description: Voucher code to be redeemed
+          type: string
+      required:
+      - cryptoAddress
+      - currency
+      - email
+      - network
+      - voucherCode
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--v1-voucher-fee:
+      properties:
+        amount:
+          type: integer
+        currency:
+          enum:
+          - NGN
+          - USD
+          type: string
+      required:
+      - amount
+      - currency
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - amount
+      - currency
+    konfig-generated-schema-single-parameter-schema-get--v1-voucher-min-max:
+      properties:
+        currency:
+          enum:
+          - NGN
+          - USD
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - currency
+    konfig-generated-schema-single-parameter-schema-post--auth-api-key:
+      properties:
+        otpType:
+          type: string
+        token:
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--payment:
+      properties:
+        accountName:
+          description: The account name. Required when paymentType is bank
+          type: string
+        accountNumber:
+          description: The account number. Required when paymentType is bank
+          type: string
+        bank:
+          description: The bank name. Required when paymentType is bank
+          type: string
+        bankCode:
+          description: The bank code. Required when paymentType is bank
+          type: string
+        businessId:
+          description: The business id
+          type: string
+        coinprofileUsername:
+          description: The coinprofile username. Required when paymentType is profile
+          type: string
+        country:
+          description: The country. Required when paymentType is bank
+          type: string
+        customerEmail:
+          description: The rate key
+          type: string
+        incomingAmount:
+          description: The incoming amount
+          type: number
+        incomingCurrency:
+          description: The incoming currency
+          type: string
+        outgoingAmount:
+          description: The outgoing amount
+          type: number
+        outgoingCurrency:
+          description: The outgoing currency
+          type: string
+        paymentType:
+          description: The payment type
+          type: string
+        rateKey:
+          description: The rate key
+          type: string
+        reference:
+          description: The reference
+          type: string
+      required:
+      - businessId
+      - customerEmail
+      - incomingCurrency
+      - outgoingCurrency
+      - paymentType
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--payment-paymentId:
+      properties:
+        paymentId:
+          type: string
+      required:
+      - paymentId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - paymentId
+    konfig-generated-schema-single-parameter-schema-get--transaction-transactionId:
+      properties:
+        transactionId:
+          type: string
+      required:
+      - transactionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - transactionId
+    konfig-generated-schema-single-parameter-schema-get--currency-rate:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--currency-minimum-allowed:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--currency-supported:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--wallet-supported-config:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--payment-resolve:
+      properties:
+        id:
+          type: string
+        option:
+          enum:
+          - refundexcess
+          - payall
+          type: string
+      required:
+      - id
+      - option
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - id
+      - option
+    konfig-generated-schema-single-parameter-schema-get--callbackurl:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-put--callbackurl:
+      properties:
+        callbackUrl:
+          description: The callback url. e.g. https://www.example.com/callback
+          type: string
+      required:
+      - callbackUrl
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--transaction:
+      properties:
+        currency:
+          enum:
+          - NGN
+          - USD
+          type: string
+        type:
+          enum:
+          - deposit
+          - withdrawal
+          - sent
+          - transfer
+          - internalTransfer
+          - conversion
+          type: string
+        page:
+          type: number
+        limit:
+          type: number
+        duration:
+          enum:
+          - null
+          - null
+          - null
+          - null
+          type: number
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - currency
+      - type
+      - page
+      - limit
+      - duration
+    konfig-generated-schema-single-parameter-schema-get--transaction-summary:
+      properties:
+        currency:
+          enum:
+          - NGN
+          - USD
+          type: string
+        type:
+          enum:
+          - deposit
+          - withdrawal
+          - sent
+          - transfer
+          - internalTransfer
+          - conversion
+          type: string
+        page:
+          type: number
+        limit:
+          type: number
+        duration:
+          enum:
+          - null
+          - null
+          - null
+          - null
+          type: number
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - currency
+      - type
+      - page
+      - limit
+      - duration
+    konfig-generated-schema-single-parameter-schema-get--wallet:
+      properties:
+        currency:
+          type: string
+        network:
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - currency
+      - network
+    konfig-generated-schema-single-parameter-schema-post--balance-withdraw:
+      properties:
+        accountName:
+          description: The account name. This is the name of the account holder.
+          type: string
+        accountNumber:
+          description: The account number of the user's bank account.
+          type: string
+        amount:
+          description: The amount to be withdrawn.
+          type: string
+        bank:
+          description: The bank name. e.g. "Access Bank".
+          type: string
+        bankCode:
+          description: The bank code. e.g. "044".
+          type: string
+        currency:
+          description: The currency of the withdrawal.
+          type: string
+        otpType:
+          description: The type of OTP to be used.
+          enum:
+          - otp
+          - totp
+          type: string
+        token:
+          description: The token to be used for OTP.
+          type: string
+      required:
+      - accountName
+      - accountNumber
+      - amount
+      - bank
+      - bankCode
+      - currency
+      - otpType
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--bank-resolve:
+      properties:
+        accountNumber:
+          description: The account number.
+          type: string
+        bankCode:
+          description: The bank code.
+          type: string
+      required:
+      - accountNumber
+      - bankCode
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--bank-supported:
+      properties:
+        country:
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - country
+    konfig-generated-schema-single-parameter-schema-get--balance:
+      properties:
+        currency:
+          enum:
+          - NGN
+          - USD
+          - USDT
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - currency
+    konfig-generated-schema-single-parameter-schema-post--balance-transfer:
+      properties:
+        amount:
+          description: Amount to transfer.
+          type: string
+        currency:
+          description: Currency being sent.
+          enum:
+          - NGN
+          - USD
+          type: string
+        memo:
+          description: Transaction memo.
+          maxLength: 28
+          type: string
+        otpType:
+          description: The type of OTP to be used.
+          enum:
+          - otp
+          - totp
+          type: string
+        receiverUsername:
+          description: Receiver's coinprofile username.
+          type: string
+        token:
+          description: The token to be used for OTP.
+          type: string
+      required:
+      - currency
+      - receiverUsername
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--wallet-transfer:
+      properties:
+        address:
+          description: Wallet address to transfer crypto
+          type: string
+        amount:
+          description: Amount of crypto to be transferred
+          type: number
+        currency:
+          description: Currency of the crypto to be transferred
+          type: string
+        memo:
+          description: Optional transaction memo
+          type: string
+        network:
+          description: Network on which crypto is to be transferred
+          type: string
+        walletType:
+          description: Wallet type
+          type: string
+      required:
+      - address
+      - amount
+      - currency
+      - network
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    BalanceGetAccountBalanceResponse_data:
+      example:
+        amount: 0
+        txnCount: 6
+        merchant: merchant
+        currency: currency
+      properties:
+        amount:
+          description: Merchant's balance amount
+          format: int32
+          type: integer
+        currency:
+          description: The currency passed by merchant
+          type: string
+        merchant:
+          description: Merchant'susername
+          type: string
+        txnCount:
+          description: Total count of voucher redeemption for a given merchant
+          format: int32
+          type: integer
+      type: object
+    MerchantsGetRecordResponse_data:
+      example:
+        expires: 2023-10-03T09:21:05.197Z
+        logo: https://www.example.com/favicon
+        creditCurrency: NGN
+        email: email
+        username: username
+      properties:
+        creditCurrency:
+          description: Merchant's credit currency
+          enum:
+          - NGN
+          - USD
+          type: string
+        email:
+          description: Merchant email address
+          type: string
+        expires:
+          description: API key expiry date and time
+          example: 2023-10-03T09:21:05.197Z
+          format: date-time
+          type: string
+          x-konfig-original-example: 2023-10-03T09:21:05.197Z
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-MerchantsGetRecordResponse-properties-data-properties-expires
+        logo:
+          description: Merchant logo URL
+          example: https://www.example.com/favicon
+          type: string
+          x-konfig-original-example: https://www.example.com/favicon
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-MerchantsGetRecordResponse-properties-data-properties-logo
+        username:
+          description: Merchant username
+          type: string
+      type: object
+    MerchantsUpdateRecordResponse_data:
+      example:
+        logo: logo
+        callbackUrl: callbackUrl
+        feeBearer: feeBearer
+        creditCurrency: NGN
+        username: username
+      properties:
+        callbackUrl:
+          type: string
+        creditCurrency:
+          enum:
+          - NGN
+          - USD
+          type: string
+        feeBearer:
+          type: string
+        logo:
+          type: string
+        username:
+          type: string
+      type: object
+    RatesGetConversionRatesResponse_data_USDNGN:
+      example:
+        rateKey: rateKey
+        description: description
+        value: 490
+      properties:
+        description:
+          description: description text
+          type: string
+        rateKey:
+          description: Ventogram signed rate key
+          type: string
+        value:
+          description: 1 USD is equal to 500 NGN in this example
+          example: 490
+          format: int32
+          type: integer
+          x-konfig-original-example: 490
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-RatesGetConversionRatesResponse-properties-data-properties-USDNGN-properties-value
+      type: object
+    RatesGetConversionRatesResponse_data:
+      example:
+        USDNGN:
+          rateKey: rateKey
+          description: description
+          value: 490
+      properties:
+        USDNGN:
+          $ref: '#/components/schemas/RatesGetConversionRatesResponse_data_USDNGN'
+      type: object
+    TransactionsGetMerchantTransactionSummaryResponse_data:
+      example:
+        totalUnredeemed: 5
+        totalPaid: 0
+        totalUnpaid: 1
+        totalRedeemed: 6
+      properties:
+        totalPaid:
+          description: Total count of paid vouchers
+          format: int32
+          type: integer
+        totalRedeemed:
+          description: Total count of redeemed vouchers
+          format: int32
+          type: integer
+        totalUnpaid:
+          description: Total count of unpaid vouchers
+          format: int32
+          type: integer
+        totalUnredeemed:
+          description: Total count of unredeemed vouchers
+          format: int32
+          type: integer
+      type: object
+    VoucherGetRecordResponse_data_inner:
+      example:
+        amount: 0.8008281904610115
+        dateRedeemed: 2000-01-23T04:56:07.000+00:00
+        accountType: dynamic
+        cancelledAt: 2000-01-23T04:56:07.000+00:00
+        fee: 6.027456183070403
+        memo: memo
+        merchant: merchant
+        feeBearer: feeBearer
+        createdAt: createdAt
+        paymentExpiresAt: 2000-01-23T04:56:07.000+00:00
+        currency: currency
+        fullname: fullname
+        id: id
+        email: email
+        paymentStatus: paid
+        voucherCode: voucherCode
+      properties:
+        accountType:
+          description: Type of created bank account. Note that this property is only
+            available in v2.
+          enum:
+          - dynamic
+          - static
+          type: string
+        amount:
+          type: number
+        cancelledAt:
+          description: This property is optional. Only available if the voucher has
+            been cancelled.
+          format: date-time
+          type: string
+        createdAt:
+          type: string
+        currency:
+          type: string
+        dateRedeemed:
+          description: "Timestamp of when the voucher was redeemed. If voucher has\
+            \ not been redeemed, this field is undefined."
+          format: date-time
+          type: string
+        email:
+          type: string
+        fee:
+          type: number
+        feeBearer:
+          type: string
+        fullname:
+          type: string
+        id:
+          type: string
+        memo:
+          type: string
+        merchant:
+          type: string
+        paymentExpiresAt:
+          format: date-time
+          type: string
+        paymentStatus:
+          enum:
+          - paid
+          - unpaid
+          - declined
+          type: string
+        voucherCode:
+          description: Voucher code. Present only if voucher has been paid
+          type: string
+      type: object
+    VoucherRedeemExistingUnusedResponse_data:
+      example:
+        amount: 0.8008281904610115
+        currentBalance: 6.027456183070403
+        fee: 1.4658129805029452
+        fromAmount: 5.962133916683182
+        toAmount: 7.061401241503109
+        merchant: merchant
+        feeBearer: client
+        previousBalance: 5.637376656633329
+        rate: 2.3021358869347655
+        toCurrency: toCurrency
+        currency: NGN
+        fromCurrency: fromCurrency
+        wavedFee: 9.301444243932576
+        id: id
+        email: email
+        voucherCode: voucherCode
+      properties:
+        amount:
+          description: Voucher amount after fee deduction
+          type: number
+        currency:
+          description: voucher payment currency
+          enum:
+          - NGN
+          - USD
+          type: string
+        currentBalance:
+          description: Merchant's balance after redeeming voucher
+          type: number
+        email:
+          description: Email that aws used to create the voucher
+          type: string
+        fee:
+          description: The fee associated with voucher
+          type: number
+        feeBearer:
+          default: client
+          description: The bearer of voucher fee
+          enum:
+          - client
+          - merchant
+          example: client
+          type: string
+          x-konfig-original-example: client
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherRedeemExistingUnusedResponse-properties-data-properties-feeBearer
+        fromAmount:
+          description: "The amount in the currency that was converted from when conversion\
+            \ was done. If there's no conversion, this is the same as toAmount."
+          type: number
+        fromCurrency:
+          description: "The currency from which conversion was done. If there's no\
+            \ conversion, this is the same as toCurrency."
+          type: string
+        id:
+          description: Voucher ID
+          type: string
+        merchant:
+          description: username of the merchant that created the voucher
+          type: string
+        previousBalance:
+          description: Merchant's balance before redeeming voucher
+          type: number
+        rate:
+          description: "The exchange rate that was used for conversion when conversion\
+            \ was done. If there's no conversion, the value is 1."
+          type: number
+        toAmount:
+          description: "The amount in the currency that was converted to when conversion\
+            \ was done. If there's no conversion, this is the same as fromAmount."
+          type: number
+        toCurrency:
+          description: "The currency to which conversion was done. If there's no conversion,\
+            \ this is the same as fromCurrency."
+          type: string
+        voucherCode:
+          description: Voucher code to be redeemed
+          type: string
+        wavedFee:
+          description: Waved fee (if available)
+          type: number
+      type: object
+    VoucherCreatePaymentResponse_data:
+      example:
+        id: id
+      properties:
+        id:
+          description: Voucher unique id
+          type: string
+      type: object
+    VoucherGetMultipleRecordsResponse_data_inner:
+      example:
+        rateKey: rateKey
+        amount: 0.8008281904610115
+        dateRedeemed: 2000-01-23T04:56:07.000+00:00
+        fee: 1.4658129805029452
+        memo: memo
+        merchant: merchant
+        feeBearer: client
+        receivedAmount: 5.637376656633329
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        rate: 5.962133916683182
+        paidAt: 2000-01-23T04:56:07.000+00:00
+        currency: currency
+        fullname: fullname
+        id: id
+        expectedAmount: 6.027456183070403
+        email: email
+        paymentStatus: paid
+        voucherCode: voucherCode
+      properties:
+        amount:
+          type: number
+        createdAt:
+          format: date-time
+          type: string
+        currency:
+          type: string
+        dateRedeemed:
+          description: This is defined only if the voucher payment has been received
+          format: date-time
+          type: string
+        email:
+          type: string
+        expectedAmount:
+          type: number
+        fee:
+          type: number
+        feeBearer:
+          enum:
+          - client
+          - merchant
+          type: string
+        fullname:
+          type: string
+        id:
+          type: string
+        memo:
+          type: string
+        merchant:
+          type: string
+        paidAt:
+          description: This is defined only if the voucher payment has been received
+          format: date-time
+          type: string
+        paymentStatus:
+          enum:
+          - paid
+          - unpaid
+          type: string
+        rate:
+          description: This is defined only if the voucher has been paid and redeemed
+          type: number
+        rateKey:
+          description: This is defined only if the voucher was created using a valid
+            rate key
+          type: string
+        receivedAmount:
+          description: This is defined only if the voucher payment has been received
+          type: number
+        voucherCode:
+          description: This is defined only if the voucher payment has been received
+          type: string
+      type: object
+    VoucherGetMultipleRecordsResponse_meta:
+      example:
+        nextPage: nextPage
+        prevPage: prevPage
+      properties:
+        nextPage:
+          description: Contanis the URL of the next page to be fetched relative on
+            the URL parameters of the last paged fetched. This is null if there are
+            no more records to fetch.
+          type: string
+        prevPage:
+          description: Contanis the URL of the previous page that was fetched fetched
+            relative on the URL parameters of the current paged
+          type: string
+      type: object
+    VoucherRedeemAndWithdrawResponse_data:
+      example:
+        toAccount: toAccount
+        withdrawalFee: 3.616076749251911
+        currentBalance: 6.027456183070403
+        fromAmount: 1.4658129805029452
+        merchantFee: 5.962133916683182
+        toAmount: 7.061401241503109
+        merchant: merchant
+        feeBearer: merchant
+        voucherFee: 9.301444243932576
+        convertedVoucherFee: 0.8008281904610115
+        previousBalance: 5.637376656633329
+        reference: reference
+        rate: 2.3021358869347655
+        toCurrency: toCurrency
+        fromCurrency: fromCurrency
+        convertedVoucherFeeCurrency: convertedVoucherFeeCurrency
+        creditCurrency: creditCurrency
+        id: id
+        email: email
+        voucherCode: voucherCode
+      properties:
+        convertedVoucherFee:
+          description: Voucher fee in the outgoing currency
+          type: number
+        convertedVoucherFeeCurrency:
+          description: The same as toCurrency
+          type: string
+        creditCurrency:
+          description: Merchant's balance currency
+          type: string
+        currentBalance:
+          description: Merchant's balance after redeeming voucher
+          type: number
+        email:
+          description: Email that aws used to create the voucher
+          type: string
+        feeBearer:
+          description: The bearer of voucher fee
+          enum:
+          - merchant
+          - client
+          type: string
+        fromAmount:
+          description: Voucher payment amount.
+          type: number
+        fromCurrency:
+          description: voucher payment currency
+          type: string
+        id:
+          description: Voucher ID
+          type: string
+        merchant:
+          description: username of the merchant that created the voucher
+          type: string
+        merchantFee:
+          description: This can be optionally provided by the merchant in the request
+            if they want some of the received amount to be added to their Ventogram
+            balance.
+          type: number
+        previousBalance:
+          description: Merchant's balance before redeeming voucher
+          type: number
+        rate:
+          description: "The exchange rate that was used for conversion (if applicable)\
+            \ at the time of redeeming the voucher. If there's no conversion, the\
+            \ value is 1."
+          type: number
+        reference:
+          description: This is basically a unique id
+          type: string
+        toAccount:
+          description: The crypto wallet address to which asset was transferred
+          type: string
+        toAmount:
+          description: The amount that was sent to user wallet address.
+          type: number
+        toCurrency:
+          description: The currency that was sent to user wallet.
+          type: string
+        voucherCode:
+          description: Voucher code to be redeemed
+          type: string
+        voucherFee:
+          description: The fee associated with voucher in the payment currency. This
+            will be deducted from merchant's balance if merchant is the fee bearer.
+          type: number
+        withdrawalFee:
+          description: The processing fee for the crypto transfer that will be deducted
+            from the merchant's account. Merchants must maintain a sufficient balance
+            to utilize the redeem-and-withdraw endpoint.
+          type: number
+      type: object
+    VoucherFeeGetFeeResponse_data:
+      example:
+        voucherFee: 0
+      properties:
+        voucherFee:
+          format: int32
+          type: integer
+      type: object
+    VoucherMinmaxAmountGetMinMaxAmountResponse_data_NGN:
+      example:
+        min: 500
+        max: 2000000
+      properties:
+        max:
+          example: 2000000
+          type: number
+          x-konfig-original-example: 2000000
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherMinmaxAmountGetMinMaxAmountResponse-properties-data-properties-NGN-properties-max
+        min:
+          example: 500
+          type: number
+          x-konfig-original-example: 500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherMinmaxAmountGetMinMaxAmountResponse-properties-data-properties-NGN-properties-min
+      type: object
+    VoucherMinmaxAmountGetMinMaxAmountResponse_data_USD:
+      example:
+        min: 100
+        max: 2000
+      properties:
+        max:
+          example: 2000
+          type: number
+          x-konfig-original-example: 2000
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherMinmaxAmountGetMinMaxAmountResponse-properties-data-properties-USD-properties-max
+        min:
+          example: 100
+          type: number
+          x-konfig-original-example: 100
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-VoucherMinmaxAmountGetMinMaxAmountResponse-properties-data-properties-USD-properties-min
+      type: object
+    VoucherMinmaxAmountGetMinMaxAmountResponse_data:
+      example:
+        NGN:
+          min: 500
+          max: 2000000
+        USD:
+          min: 100
+          max: 2000
+      properties:
+        NGN:
+          $ref: '#/components/schemas/VoucherMinmaxAmountGetMinMaxAmountResponse_data_NGN'
+        USD:
+          $ref: '#/components/schemas/VoucherMinmaxAmountGetMinMaxAmountResponse_data_USD'
+      type: object
+    ApiKeyGenerateNewApiKeyResponse_data:
+      example:
+        expires: 2000-01-23
+        key: key
+      properties:
+        expires:
+          format: date
+          type: string
+        key:
+          type: string
+      type: object
+    PaymentCreateNewPaymentResponse_data:
+      example:
+        address: address
+        incomingAmount: 6
+        expTime: expTime
+        businessId: businessId
+        incomingCurrency: incomingCurrency
+        unconfirmedAmount: 5
+        paymentType: paymentType
+        reference: reference
+        createdAt: createdAt
+        outgoingCurrency: outgoingCurrency
+        confirmedAmount: 0
+        rate: 5
+        customerEmail: customerEmail
+        _id: _id
+        state: state
+        threadTS: threadTS
+        account: account
+        senderUsername: senderUsername
+        outgoingAmount: 1
+        updatedAt: updatedAt
+      properties:
+        _id:
+          type: string
+        account:
+          type: string
+        address:
+          type: string
+        businessId:
+          type: string
+        confirmedAmount:
+          format: int32
+          type: integer
+        createdAt:
+          type: string
+        customerEmail:
+          type: string
+        expTime:
+          type: string
+        incomingAmount:
+          format: int32
+          type: integer
+        incomingCurrency:
+          type: string
+        outgoingAmount:
+          format: int32
+          type: integer
+        outgoingCurrency:
+          type: string
+        paymentType:
+          type: string
+        rate:
+          format: int32
+          type: integer
+        reference:
+          type: string
+        senderUsername:
+          type: string
+        state:
+          type: string
+        threadTS:
+          type: string
+        unconfirmedAmount:
+          format: int32
+          type: integer
+        updatedAt:
+          type: string
+      type: object
+    RatesGetCurrentRatesResponse_data_YOUR_CURRENCY:
+      example:
+        rate: 0.8008282
+        key: key
+      properties:
+        key:
+          type: string
+        rate:
+          format: float
+          type: number
+      type: object
+    RatesGetCurrentRatesResponse_data:
+      example:
+        signature: signature
+        YOUR_CURRENCY:
+          rate: 0.8008282
+          key: key
+        publicKey: publicKey
+      properties:
+        YOUR_CURRENCY:
+          $ref: '#/components/schemas/RatesGetCurrentRatesResponse_data_YOUR_CURRENCY'
+        publicKey:
+          type: string
+        signature:
+          type: string
+      type: object
+    CurrencyListSupportedCurrenciesResponse_data:
+      example:
+        incomingCurrencies:
+        - incomingCurrencies
+        - incomingCurrencies
+        outgoingCurrencies:
+        - outgoingCurrencies
+        - outgoingCurrencies
+      properties:
+        incomingCurrencies:
+          items:
+            type: string
+          type: array
+        outgoingCurrencies:
+          items:
+            type: string
+          type: array
+      type: object
+    WalletGetSupportedConfigResponse_data:
+      example:
+        byCurrency: "{}"
+        byNetwork: "{}"
+      properties:
+        byCurrency:
+          type: object
+        byNetwork:
+          type: object
+      type: object
+    WebhookGetCallbackUrlResponse_data:
+      example:
+        callbackUrl: callbackUrl
+      properties:
+        callbackUrl:
+          description: The callback url. e.g. https://www.example.com/callback
+          type: string
+      type: object
+    TransactionGetUserTransactionsResponse_data_data_inner:
+      example:
+        date: date
+        amount: 0.8008281904610115
+        senderPrevbalance: 5.637376656633329
+        fee: 6.027456183070403
+        fromAmount: 1.4658129805029452
+        prevBalance: 5.962133916683182
+        businessId: businessId
+        isFromRegUser: true
+        type: type
+        version: version
+        transactionId: transactionId
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        sender: sender
+        currency: currency
+        fromCurrency: fromCurrency
+        status: status
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+        username: username
+      properties:
+        version:
+          type: string
+        amount:
+          format: int32
+          type: number
+        businessId:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        currency:
+          type: string
+        date:
+          type: string
+        fee:
+          format: int32
+          type: number
+        fromAmount:
+          format: int32
+          type: number
+        fromCurrency:
+          type: string
+        isFromRegUser:
+          type: boolean
+        prevBalance:
+          format: int32
+          type: number
+        sender:
+          type: string
+        senderPrevbalance:
+          format: int32
+          type: number
+        status:
+          type: string
+        transactionId:
+          type: string
+        type:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        username:
+          type: string
+      type: object
+    TransactionGetUserTransactionsResponse_data:
+      example:
+        total: 3.616076749251911
+        pages: 7.061401241503109
+        perPage: 9.301444243932576
+        data:
+        - date: date
+          amount: 0.8008281904610115
+          senderPrevbalance: 5.637376656633329
+          fee: 6.027456183070403
+          fromAmount: 1.4658129805029452
+          prevBalance: 5.962133916683182
+          businessId: businessId
+          isFromRegUser: true
+          type: type
+          version: version
+          transactionId: transactionId
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          sender: sender
+          currency: currency
+          fromCurrency: fromCurrency
+          status: status
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+          username: username
+        - date: date
+          amount: 0.8008281904610115
+          senderPrevbalance: 5.637376656633329
+          fee: 6.027456183070403
+          fromAmount: 1.4658129805029452
+          prevBalance: 5.962133916683182
+          businessId: businessId
+          isFromRegUser: true
+          type: type
+          version: version
+          transactionId: transactionId
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          sender: sender
+          currency: currency
+          fromCurrency: fromCurrency
+          status: status
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+          username: username
+        page: 2.3021358869347655
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/TransactionGetUserTransactionsResponse_data_data_inner'
+          type: array
+        page:
+          format: int32
+          type: number
+        pages:
+          format: int32
+          type: number
+        perPage:
+          format: int32
+          type: number
+        total:
+          format: int32
+          type: number
+      type: object
+    TransactionGetUserTransactionSummaryResponse_data_summary:
+      example:
+        duration: 0.8008281904610115
+        volume: 1.4658129805029452
+        txnCount: 6.027456183070403
+      properties:
+        duration:
+          format: int32
+          type: number
+        txnCount:
+          format: int32
+          type: number
+        volume:
+          format: int32
+          type: number
+      type: object
+    TransactionGetUserTransactionSummaryResponse_data:
+      example:
+        summary:
+          duration: 0.8008281904610115
+          volume: 1.4658129805029452
+          txnCount: 6.027456183070403
+        txn:
+          total: 3.616076749251911
+          pages: 7.061401241503109
+          perPage: 9.301444243932576
+          data:
+          - date: date
+            amount: 0.8008281904610115
+            senderPrevbalance: 5.637376656633329
+            fee: 6.027456183070403
+            fromAmount: 1.4658129805029452
+            prevBalance: 5.962133916683182
+            businessId: businessId
+            isFromRegUser: true
+            type: type
+            version: version
+            transactionId: transactionId
+            createdAt: 2000-01-23T04:56:07.000+00:00
+            sender: sender
+            currency: currency
+            fromCurrency: fromCurrency
+            status: status
+            updatedAt: 2000-01-23T04:56:07.000+00:00
+            username: username
+          - date: date
+            amount: 0.8008281904610115
+            senderPrevbalance: 5.637376656633329
+            fee: 6.027456183070403
+            fromAmount: 1.4658129805029452
+            prevBalance: 5.962133916683182
+            businessId: businessId
+            isFromRegUser: true
+            type: type
+            version: version
+            transactionId: transactionId
+            createdAt: 2000-01-23T04:56:07.000+00:00
+            sender: sender
+            currency: currency
+            fromCurrency: fromCurrency
+            status: status
+            updatedAt: 2000-01-23T04:56:07.000+00:00
+            username: username
+          page: 2.3021358869347655
+      properties:
+        summary:
+          $ref: '#/components/schemas/TransactionGetUserTransactionSummaryResponse_data_summary'
+        txn:
+          $ref: '#/components/schemas/TransactionGetUserTransactionsResponse_data'
+      type: object
+    WalletGetAddressesResponse_wallet:
+      example:
+        reference: reference
+        createdAt: 0.8008281904610115
+        uid: uid
+        addresses: ""
+        appName: appName
+        version: version
+        status: status
+        updatedAt: 6.027456183070403
+      properties:
+        version:
+          type: string
+        addresses:
+          type: array
+        appName:
+          type: string
+        createdAt:
+          format: int32
+          type: number
+        reference:
+          type: string
+        status:
+          type: string
+        uid:
+          type: string
+        updatedAt:
+          format: int32
+          type: number
+      type: object
+    BankAccountVerifyAndReturnDetailsResponse_data:
+      example:
+        country: country
+        responsecode: responsecode
+        accountnumber: accountnumber
+        code: code
+        is_visible: is_visible
+        responsemessage: responsemessage
+        phonenumber: phonenumber
+        created_at: created_at
+        uniquereference: uniquereference
+        deleted_at: deleted_at
+        accountname: accountname
+        updated_at: updated_at
+        is_trashed: is_trashed
+        name: name
+        currency: currency
+        internalreference: internalreference
+      properties:
+        accountname:
+          type: string
+        accountnumber:
+          type: string
+        code:
+          type: string
+        country:
+          type: string
+        created_at:
+          type: string
+        currency:
+          type: string
+        deleted_at:
+          type: string
+        internalreference:
+          type: string
+        is_trashed:
+          type: string
+        is_visible:
+          type: string
+        name:
+          type: string
+        phonenumber:
+          type: string
+        responsecode:
+          type: string
+        responsemessage:
+          type: string
+        uniquereference:
+          type: string
+        updated_at:
+          type: string
+      type: object
+    BankGetSupportedBanksResponse_data_inner:
+      example:
+        Code: Code
+        Name: Name
+      properties:
+        Code:
+          type: string
+        Name:
+          type: string
+      type: object
+    BalanceGetAccountBalance200Response_data_balances:
+      example:
+        amount: 0
+        toCurrency: toCurrency
+        txnCount: 5.637376656633329
+        totalSent: 5
+        totalRecieved: 1
+        formattedAmount: 6
+      properties:
+        amount:
+          description: User's balance amount
+          format: int32
+          type: integer
+        formattedAmount:
+          format: int32
+          type: integer
+        toCurrency:
+          type: string
+        totalRecieved:
+          format: int32
+          type: integer
+        totalSent:
+          format: int32
+          type: integer
+        txnCount:
+          type: number
+      type: object
+    BalanceGetAccountBalance200Response_data:
+      example:
+        balances:
+          amount: 0
+          toCurrency: toCurrency
+          txnCount: 5.637376656633329
+          totalSent: 5
+          totalRecieved: 1
+          formattedAmount: 6
+      properties:
+        balances:
+          $ref: '#/components/schemas/BalanceGetAccountBalance200Response_data_balances'
+      type: object
+    BalanceTransferFundsResponse_data:
+      example:
+        date: 2000-01-23
+        receiveAmount: receiveAmount
+        amount: amount
+        sender: sender
+        toCurrency: NGN
+        senderPrevbalance: senderPrevbalance
+        fromCurrency: NGN
+        transactionId: transactionId
+        status: fullfiled
+        username: username
+      properties:
+        amount:
+          type: string
+        date:
+          format: date
+          type: string
+        fromCurrency:
+          enum:
+          - NGN
+          - USD
+          type: string
+        receiveAmount:
+          type: string
+        sender:
+          type: string
+        senderPrevbalance:
+          type: string
+        status:
+          enum:
+          - fullfiled
+          - processing
+          - failed
+          type: string
+        toCurrency:
+          enum:
+          - NGN
+          - USD
+          type: string
+        transactionId:
+          type: string
+        username:
+          type: string
+      type: object
+    WalletExecuteTransferResponse_data_transferDetail:
+      example:
+        date: date
+        receiveAmount: 6.027456183070403
+        amount: 0.8008281904610115
+        address: address
+        sender: sender
+        toCurrency: toCurrency
+        memo: memo
+        fromCurrency: fromCurrency
+        type: type
+        transactionId: transactionId
+        status: status
+        username: username
+      properties:
+        address:
+          type: string
+        amount:
+          type: number
+        date:
+          type: string
+        fromCurrency:
+          type: string
+        memo:
+          type: string
+        receiveAmount:
+          type: number
+        sender:
+          type: string
+        status:
+          type: string
+        toCurrency:
+          type: string
+        transactionId:
+          type: string
+        type:
+          type: string
+        username:
+          type: string
+      type: object
+    WalletExecuteTransferResponse_data:
+      example:
+        transferDetail:
+          date: date
+          receiveAmount: 6.027456183070403
+          amount: 0.8008281904610115
+          address: address
+          sender: sender
+          toCurrency: toCurrency
+          memo: memo
+          fromCurrency: fromCurrency
+          type: type
+          transactionId: transactionId
+          status: status
+          username: username
+      properties:
+        transferDetail:
+          $ref: '#/components/schemas/WalletExecuteTransferResponse_data_transferDetail'
+      type: object
+  securitySchemes:
+    AdminSecret:
+      in: header
+      name: X-Admin-Secret
+      type: apiKey
+      x-konfig-globally-required-security: false
+    ApiKey:
+      in: header
+      name: X-Api-Key
+      type: apiKey
+      x-konfig-globally-required-security: false
+    ApiUser:
+      in: header
+      name: X-Api-User
+      type: apiKey
+      x-konfig-globally-required-security: false
+    UserVersion:
+      in: header
+      name: X-User-Version
+      type: apiKey
+      x-konfig-globally-required-security: false
+
