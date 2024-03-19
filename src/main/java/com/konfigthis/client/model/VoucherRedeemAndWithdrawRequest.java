@@ -108,54 +108,9 @@ public class VoucherRedeemAndWithdrawRequest {
   @SerializedName(SERIALIZED_NAME_EMAIL)
   private String email;
 
-  /**
-   * In USD (optional). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee)
-   */
-  @JsonAdapter(MerchantFeeEnum.Adapter.class)
- public enum MerchantFeeEnum {
-    USD("USD");
-
-    private String value;
-
-    MerchantFeeEnum(String value) {
-      this.value = value;
-    }
-
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    public static MerchantFeeEnum fromValue(String value) {
-      for (MerchantFeeEnum b : MerchantFeeEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-
-    public static class Adapter extends TypeAdapter<MerchantFeeEnum> {
-      @Override
-      public void write(final JsonWriter jsonWriter, final MerchantFeeEnum enumeration) throws IOException {
-        jsonWriter.value(enumeration.getValue());
-      }
-
-      @Override
-      public MerchantFeeEnum read(final JsonReader jsonReader) throws IOException {
-        String value =  jsonReader.nextString();
-        return MerchantFeeEnum.fromValue(value);
-      }
-    }
-  }
-
   public static final String SERIALIZED_NAME_MERCHANT_FEE = "merchantFee";
   @SerializedName(SERIALIZED_NAME_MERCHANT_FEE)
-  private MerchantFeeEnum merchantFee;
+  private String merchantFee;
 
   public static final String SERIALIZED_NAME_NETWORK = "network";
   @SerializedName(SERIALIZED_NAME_NETWORK)
@@ -259,7 +214,7 @@ public class VoucherRedeemAndWithdrawRequest {
   }
 
 
-  public VoucherRedeemAndWithdrawRequest merchantFee(MerchantFeeEnum merchantFee) {
+  public VoucherRedeemAndWithdrawRequest merchantFee(String merchantFee) {
     
     
     
@@ -269,18 +224,18 @@ public class VoucherRedeemAndWithdrawRequest {
   }
 
    /**
-   * In USD (optional). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee)
+   * In USD (optional) with a precision of 2 decimal places (max). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee)
    * @return merchantFee
   **/
   @javax.annotation.Nullable
-  @ApiModelProperty(value = "In USD (optional). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee)")
+  @ApiModelProperty(value = "In USD (optional) with a precision of 2 decimal places (max). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee)")
 
-  public MerchantFeeEnum getMerchantFee() {
+  public String getMerchantFee() {
     return merchantFee;
   }
 
 
-  public void setMerchantFee(MerchantFeeEnum merchantFee) {
+  public void setMerchantFee(String merchantFee) {
     
     
     

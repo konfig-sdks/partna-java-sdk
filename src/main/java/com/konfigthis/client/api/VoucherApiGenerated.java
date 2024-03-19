@@ -741,7 +741,7 @@ public class VoucherApiGenerated {
 
         /**
          * Set merchantFee
-         * @param merchantFee In USD (optional). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee) (optional)
+         * @param merchantFee In USD (optional) with a precision of 2 decimal places (max). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee) (optional)
          * @return RedeemAndWithdrawRequestBuilder
          */
         public RedeemAndWithdrawRequestBuilder merchantFee(String merchantFee) {
@@ -781,8 +781,7 @@ public class VoucherApiGenerated {
             if (this.currency != null)
             voucherRedeemAndWithdrawRequest.currency(VoucherRedeemAndWithdrawRequest.CurrencyEnum.fromValue(this.currency));
             voucherRedeemAndWithdrawRequest.email(this.email);
-            if (this.merchantFee != null)
-            voucherRedeemAndWithdrawRequest.merchantFee(VoucherRedeemAndWithdrawRequest.MerchantFeeEnum.fromValue(this.merchantFee));
+            voucherRedeemAndWithdrawRequest.merchantFee(this.merchantFee);
             voucherRedeemAndWithdrawRequest.network(this.network);
             voucherRedeemAndWithdrawRequest.rateKey(this.rateKey);
             voucherRedeemAndWithdrawRequest.voucherCode(this.voucherCode);

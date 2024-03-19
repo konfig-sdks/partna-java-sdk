@@ -362,7 +362,7 @@ public class Example {
     String email = "email_example"; // Email that was used to create the voucher
     String network = "network_example"; // Supported crypto network
     String voucherCode = "voucherCode_example"; // Voucher code to be redeemed
-    String merchantFee = "USD"; // In USD (optional). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee)
+    String merchantFee = "merchantFee_example"; // In USD (optional) with a precision of 2 decimal places (max). Can be supplied if the merchant want to withdraw a portion of the voucher amount into their Ventogram balance. This must be a fraction or all of voucher value (ie received amount - voucher fee)
     String rateKey = "rateKey_example"; // This is a Ventogram-signed rate key. This will be returned in response if the signed rate was used for conversion.
     try {
       VoucherRedeemAndWithdrawResponse result = client
